@@ -1,0 +1,38 @@
+import numpy as np
+import pandas as pd
+from math import log2
+
+import data from "weather_data.csv";
+
+# Convert data to DataFrame
+df = pd.DataFrame(data)
+
+# Function to calculate entropy
+def entropy(target_col):
+    elements, counts = np.unique(target_col, return_counts=True)
+    entropy_val = -np.sum([(counts[i]/np.sum(counts)) * np.log2(counts[i]/np.sum(counts)) for i in range(len(elements))])
+    return entropy_val
+
+# Function to calculate information gain
+def InfoGain(data, split_attribute_name, target_name="PlayTennis"):
+    total_entropy = entropy(data[target_name])
+    vals, counts = np.unique(data[split_attribute_name], return_counts=True)
+    Weighted_Entropy = np.sum([(counts[i]/np.sum(counts)) * entropy(data.where(data[split_attribute_name]==vals[i]).dropna()[target_name]) for i in range(len(vals))])
+    Information_Gain = total_entropy - Weighted_Entropy
+    return Information_Gain
+
+# Calculate entropy for PlayTennis
+entropy_play_tennis = entropy(df['PlayTennis'])
+print("Entropy(PlayTennis):", entropy_play_tennis)
+
+# Calculate information gain for each attribute
+for column in df.columns[:-1]:
+    print("Information Gain for", column, ":", InfoGain(df, column))
+
+Output:
+
+Entropy(PlayTennis): 0.9402859586706311
+Information Gain for Outlook : 0.24674981977443933
+Information Gain for Temperature : 0.02922256565895487
+Information Gain for Humidity : 0.15183550136234159
+Information Gain for Wind : 0.04812703040826949
